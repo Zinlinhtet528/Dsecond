@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Data Logger (Google Sheets)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+  <div class="max-w-md w-full bg-white shadow-lg rounded-xl p-8 border border-gray-100">
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-2">Smart Data Logger</h1>
+    <p class="text-center text-gray-500 mb-6">Send numeric values directly to Google Sheets.</p>
+
+    <div class="space-y-4">
+      <div>
+        <label class="text-sm font-medium text-gray-700">Code (01–98)</label>
+        <input id="code" type="text" maxlength="3"
+          class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <div>
+        <label class="text-sm font-medium text-gray-700">Value</label>
+        <input id="value" type="number"
+          class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <button id="submit-btn" onclick="submitData()"
+        class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md">
+        Submit Data
+      </button>
+    </div>
+
+    <div id="message" class="mt-6 text-center text-sm text-gray-600"></div>
+  </div>
+
+  <script>
+    // ✅ Embedded working Google Apps Script URL
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqG9GJniVog31z8iyfKwiJwJz8nA6nLFhZFY2aBQ0JOW5VKx85fLgkUe3o2zP1Oz34/exec";
+
+    async function submitData() {
+      const code = document.getElementById("code").value.trim();
+      const value = document.getElementById("value").value.trim();
+      const msgBox = document.getElementById("message");
+
+      msgBox.textContent = "";
+      if (!code || !value) {
+        msgBox.textContent = "Please fill in both fields.";
+        msgBox.className = "text-center text-red-600 mt-4";
+        return;
+      }
+
+      msgBox.textContent = "Submitting...";
+      msgBox.className = "text-center text-blue-600 mt-4";
+
+      try {
+        const res = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, value })
+        });
+        const result = await res.json();
+        msgBox.textContent = result.message;
+        msgBox.className = result.result === "success"
+          ? "text-center text-green-600 mt-4"
+          : "text-center text-red-600 mt-4";
+      } catch (err) {
+        msgBox.textContent = "Connection error — check your Apps Script deployment.";
+        msgBox.className = "text-center text-red-600 mt-4";
+      }
+    }
+  </script>
+</body>
+</html>
