@@ -1,57 +1,39 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Data Logger (Google Sheets)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <title>Simple Sheet Connector</title>
 </head>
-<body class="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-  <div class="max-w-md w-full bg-white shadow-lg rounded-xl p-8 border border-gray-100">
-    <h1 class="text-2xl font-bold text-center text-gray-800 mb-2">Smart Data Logger</h1>
-    <p class="text-center text-gray-500 mb-6">Send numeric values directly to Google Sheets.</p>
+<body>
+  <h2>Send Data to Google Sheet</h2>
+  <input id="code" placeholder="Enter code" />
+  <input id="value" placeholder="Enter value" />
+  <button onclick="sendData()">Submit</button>
 
-    <div class="space-y-4">
-      <div>
-        <label class="text-sm font-medium text-gray-700">Code (01–98)</label>
-        <input id="code" type="text" maxlength="3"
-          class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-      </div>
-
-      <div>
-        <label class="text-sm font-medium text-gray-700">Value</label>
-        <input id="value" type="number"
-          class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-      </div>
-
-      <button id="submit-btn" onclick="submitData()"
-        class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md">
-        Submit Data
-      </button>
-    </div>
-
-    <div id="message" class="mt-6 text-center text-sm text-gray-600"></div>
-  </div>
+  <p id="result"></p>
 
   <script>
-    // ✅ Embedded working Google Apps Script URL
-    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyj65gqap2JSFF2pCBPrRKejL_Ww0wUtvZ03LuC29f_VgUBBydUPZihW0dSRqd_cGP-/exec";
+    const GOOGLE_APPS_SCRIPT_URL = "<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple Sheet Connector</title>
+</head>
+<body>
+  <h2>Send Data to Google Sheet</h2>
+  <input id="code" placeholder="Enter code" />
+  <input id="value" placeholder="Enter value" />
+  <button onclick="sendData()">Submit</button>
 
-    async function submitData() {
-      const code = document.getElementById("code").value.trim();
-      const value = document.getElementById("value").value.trim();
-      const msgBox = document.getElementById("message");
+  <p id="result"></p>
 
-      msgBox.textContent = "";
-      if (!code || !value) {
-        msgBox.textContent = "Please fill in both fields.";
-        msgBox.className = "text-center text-red-600 mt-4";
-        return;
-      }
+  <script>
+    const GOOGLE_APPS_SCRIPT_URL = "PASTE_YOUR_DEPLOYMENT_URL_HERE";
 
-      msgBox.textContent = "Submitting...";
-      msgBox.className = "text-center text-blue-600 mt-4";
+    async function sendData() {
+      const code = document.getElementById("code").value;
+      const value = document.getElementById("value").value;
+      document.getElementById("result").textContent = "⏳ Sending...";
 
       try {
         const res = await fetch(GOOGLE_APPS_SCRIPT_URL, {
@@ -59,14 +41,32 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code, value })
         });
-        const result = await res.json();
-        msgBox.textContent = result.message;
-        msgBox.className = result.result === "success"
-          ? "text-center text-green-600 mt-4"
-          : "text-center text-red-600 mt-4";
+        const text = await res.text();
+        document.getElementById("result").textContent = text;
       } catch (err) {
-        msgBox.textContent = "Connection error — check your Apps Script deployment.";
-        msgBox.className = "text-center text-red-600 mt-4";
+        document.getElementById("result").textContent = "❌ Error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
+";
+
+    async function sendData() {
+      const code = document.getElementById("code").value;
+      const value = document.getElementById("value").value;
+      document.getElementById("result").textContent = "⏳ Sending...";
+
+      try {
+        const res = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, value })
+        });
+        const text = await res.text();
+        document.getElementById("result").textContent = text;
+      } catch (err) {
+        document.getElementById("result").textContent = "❌ Error: " + err.message;
       }
     }
   </script>
